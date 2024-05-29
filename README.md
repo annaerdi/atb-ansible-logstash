@@ -128,6 +128,63 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
         - geerlingguy.elasticsearch
         - geerlingguy.logstash
 
+## Example Playbook with Kafka and Opensearch:
+
+```yaml
+- name: Deploy logstash
+  hosts: test
+  remote_user: ubuntu
+  become: true
+  vars:
+    logstash_elasticsearch_hosts:
+      - http://192.168.100.11:9200
+    logstash_remove_plugins:
+      - logstash-input-s3
+      - logstash-input-sqs
+      - logstash-output-s3
+      - logstash-output-sns
+      - logstash-output-sqs
+      - logstash-output-cloudwatch
+    logstash_install_plugins:
+      - logstash-input-kafka
+      - logstash-input-beats
+      - logstash-filter-multiline
+      - logstash-integration-aws
+      - logstash-output-opensearch
+    logstash_opensearch_hosts: ["https://192.168.100.11:9200"]
+    # ca.pem from the opensearch-config
+    logstash_opensearch_ca: "/opt/ca.pem"
+    logstash_opensearch_user: "admin"
+    logstash_opensearch_password: "myStrongPassword@123!"
+    logstash_opensearch_sslverify: true
+    logstash_setup_default_config: True
+    logstash_setup_files:
+      - 01-beats-input.conf
+      - 31-opensearch-output.conf
+    logstash_monitor_local_syslog: False
+    logstash_kafka_enable: true
+    logstash_kafka_server: "kafka.aecid-testbed.local:9092"
+    logstash_kafka_topics: ["sometopic"]
+
+  pre_tasks:
+    - name: install openjdk
+      ansible.builtin.apt:
+        pkg:
+          - openjdk-21-jdk
+    - name: copy opensearch_ca
+      ansible.builtin.copy:
+        src: "ca.pem"
+        dest: "/opt/ca.pem"
+
+  roles:
+    - role: hostname
+      vars:
+        hostname: logstash2
+        hostname_ip: 192.168.100.26
+        hostname_fqdn: logstash2.aecid-testbed.local
+    - role: logstash
+```
+
 ## License
 
 MIT / BSD
