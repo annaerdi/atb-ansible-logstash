@@ -1,6 +1,6 @@
 # Ansible Role: Logstash
 
-[![CI](https://github.com/geerlingguy/ansible-role-logstash/workflows/CI/badge.svg?event=push)](https://github.com/geerlingguy/ansible-role-logstash/actions?query=workflow%3ACI)
+**This role is a fork of https://github.com/geerlingguy/ansible-role-logstash. Please note that this role is supposed to be used in simulation environments and is not meant for production.**
 
 An Ansible Role that installs Logstash on RedHat/CentOS Debian/Ubuntu.
 
@@ -11,6 +11,35 @@ Note that this role installs a syslog grok pattern by default; if you want to ad
 Though other methods are possible, this role is made to work with Elasticsearch as a backend for storing log messages.
 
 ## Role Variables
+
+Setup only specific basic-configuration-files:
+```yaml
+logstash_setup_files:
+   - 01-beats-input.conf
+   - 30-elasticsearch-output.conf
+   - 31-opensearch-output.conf
+```
+
+Delete pre-installed plugins:
+```yaml
+logstash_remove_plugins: []
+```
+
+Enable config for kafka message broker:
+```yaml
+logstash_kafka_enable: false
+logstash_kafka_server: ""
+logstash_kafka_topics: []
+```
+
+Config opensearch (if it is defined in `logstash_setup_files`):
+```yaml
+logstash_opensearch_hosts: []
+logstash_opensearch_ca: "/opt/ca.pem"
+logstash_opensearch_user: "admin"
+logstash_opensearch_password: "myStrongPassword@123!"
+logstash_opensearch_sslverify: true
+```
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 

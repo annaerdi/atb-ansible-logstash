@@ -6,6 +6,14 @@
   register: logstash_plugins_list
   changed_when: false
 
+- name: Remove plugins.
+  command: >
+    ./bin/logstash-plugin remove {{ item }}
+    chdir={{ logstash_dir }}
+  with_items: "{{ logstash_remove_plugins }}"
+  when: "item in logstash_plugins_list.stdout"
+  notify: restart logstash
+
 - name: Install configured plugins.
   command: >
     ./bin/logstash-plugin install {{ item }}
