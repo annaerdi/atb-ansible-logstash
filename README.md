@@ -8,6 +8,8 @@ Note that this role installs a syslog grok pattern by default; if you want to ad
 
 ## Requirements
 
+Java. Check the [compatibility matrix](https://www.elastic.co/support/matrix#matrix_jvm) to choose the right version.
+
 Though other methods are possible, this role is made to work with Elasticsearch as a backend for storing log messages.
 
 ## Role Variables
@@ -145,11 +147,11 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
       - logstash-output-sns
       - logstash-output-sqs
       - logstash-output-cloudwatch
+      - logstash-integration-aws
     logstash_install_plugins:
       - logstash-input-kafka
       - logstash-input-beats
       - logstash-filter-multiline
-      - logstash-integration-aws
       - logstash-output-opensearch
     logstash_opensearch_hosts: ["https://192.168.100.11:9200"]
     # ca.pem from the opensearch-config
@@ -170,7 +172,9 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
     - name: install openjdk
       ansible.builtin.apt:
         pkg:
-          - openjdk-21-jdk
+          - openjdk-11-jdk
+        state: present
+        update_cache: yes
     - name: copy opensearch_ca
       ansible.builtin.copy:
         src: "ca.pem"
