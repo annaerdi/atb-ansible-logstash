@@ -1,4 +1,5 @@
- opensearch {
+output {
+  opensearch {
     hosts => {{ logstash_opensearch_hosts | to_json }}
     cacert => "{{ logstash_opensearch_ca }}"
     user => "{{ logstash_opensearch_user }}"
