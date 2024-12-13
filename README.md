@@ -138,8 +138,6 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
   remote_user: ubuntu
   become: true
   vars:
-    logstash_elasticsearch_hosts:
-      - http://192.168.100.11:9200
     logstash_remove_plugins:
       - logstash-input-s3
       - logstash-input-sqs
@@ -153,7 +151,7 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
       - logstash-input-beats
       - logstash-filter-multiline
       - logstash-output-opensearch
-    logstash_opensearch_hosts: ["https://192.168.100.11:9200"]
+    logstash_opensearch_hosts: ["https://search.aecid-testbed.local:9200"]
     # ca.pem from the opensearch-config
     logstash_opensearch_ca: "/opt/ca.pem"
     logstash_opensearch_user: "admin"
@@ -179,6 +177,14 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
       ansible.builtin.copy:
         src: "ca.pem"
         dest: "/opt/ca.pem"
+    - name: Add opensearch to /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "192.168.100.11 search.aecid-testbed.local"
+    - name: Add kafka to /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "192.168.100.10 kafka.aecid-testbed.local"
 
   roles:
     - role: hostname
@@ -188,6 +194,12 @@ If you are seeing high CPU usage from one of the `logstash` processes, and you'r
         hostname_fqdn: logstash2.aecid-testbed.local
     - role: logstash
 ```
+
+Test connection from logstash to opensearch:
+```
+curl -u admin:myStrongPassword@123! -X GET "https://search.aecid-testbed.local:9200" --cacert /opt/ca.pem
+```
+If a json is returned with opensearch cluster information, the connection was successfully established.
 
 ## License
 
