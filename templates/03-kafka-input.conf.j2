@@ -3,5 +3,6 @@ input {
     bootstrap_servers => "{{ logstash_kafka_server }}"
     security_protocol => "PLAINTEXT"
     topics => {{ logstash_kafka_topics | to_json }}
+    codec => "json"
   }
 }
